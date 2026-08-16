@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-slate-800;
+  }
+  body {
+    @apply bg-slate-950 text-slate-100 antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #090d16;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* Dynamic theme custom overrides */
+[data-school-level="primary"] {
+  --primary-accent: #f59e0b;
+}
+
+[data-school-level="secondary"] {
+  --primary-accent: #06b6d4;
+}
+
+[data-school-level="high"] {
+  --primary-accent: #6366f1;
+}
