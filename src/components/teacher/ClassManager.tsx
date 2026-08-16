@@ -1,10 +1,58 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Plus, Copy, Check, School, Sparkles, BookOpen, Trash2, X } from 'lucide-react';
+import { Users, Plus, Copy, Check, School, Sparkles, BookOpen, Trash2, X, KeyRound } from 'lucide-react';
 import { ClassRoom, SchoolLevel } from '../../types';
 import { getClasses, createNewClass, deleteClass } from '../../lib/supabase';
 import { soundManager } from '../../lib/audio';
 import { useAuth } from '../../contexts/AuthContext';
+
+/**
+ * Hàm sinh mã PIN 6 ký tự chuẩn quy tắc:
+ * - 3 ký tự đầu: Trùng với tên lớp (Ví dụ: 6A1, 6A2, 7A1, 8B2, 9C3, 10A...)
+ * - 3 ký tự sau: Số thứ tự / ngẫu nhiên 3 chữ số (001, 002, 003... tương ứng lớp thứ n)
+ */
+export const generateClassPin = (
+  className: string,
+  gradeLevel: number,
+  classIndex: number
+): string => {
+  const clean = (className || '').trim().toUpperCase();
+
+  // 1. Trích xuất 3 ký tự đầu đại diện cho lớp
+  let prefix = '';
+
+  // Khớp các mẫu: "6A1", "6 A 1", "LỚP 6A1", "7B2", "8C3", "9A4", "10A1", "11B2"...
+  const matchFull = clean.match(/(\d{1,2})\s*([A-ZÀ-Ỹ])\s*(\d{1,2})?/);
+  if (matchFull) {
+    const grade = matchFull[1];
+    // Chuyển ký tự có dấu thành không dấu nếu có
+    const letter = matchFull[2].normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const sub = matchFull[3] || '1';
+
+    if (grade.length >= 2) {
+      // Khối 10, 11, 12 -> Lấy "10A", "11B", "12A" (3 ký tự)
+      prefix = `${grade}${letter}`.slice(0, 3);
+    } else {
+      // Khối 1-9 -> Ghép 6 + A + 1 = "6A1", 6 + A + 2 = "6A2", 7 + A + 1 = "7A1" (3 ký tự)
+      prefix = `${grade}${letter}${sub}`.slice(0, 3);
+    }
+  } else {
+    // Nếu tên không chứa mẫu chữ cái, mặc định ghép Khối + A1 (ví dụ 6 -> 6A1)
+    prefix = `${gradeLevel}A1`.slice(0, 3);
+  }
+
+  // Đảm bảo prefix luôn đủ 3 ký tự
+  while (prefix.length < 3) {
+    prefix += '1';
+  }
+
+  // 2. Tạo 3 ký tự số đuôi (001, 002, 003... cho lớp thứ n)
+  const orderNum = (classIndex + 1) % 1000;
+  const suffix = String(orderNum === 0 ? 1 : orderNum).padStart(3, '0');
+
+  // Kết hợp thành mã PIN chuẩn 6 ký tự
+  return `${prefix.slice(0, 3)}${suffix}`;
+};
 
 export const ClassManager: React.FC = () => {
   const { currentUser } = useAuth();
@@ -37,6 +85,12 @@ export const ClassManager: React.FC = () => {
     else if (level === 'high') setGradeLevel(10);
   };
 
+  // Tính toán trước Mã PIN dự kiến hiển thị trực tiếp trong Modal
+  const previewPin = useMemo(() => {
+    const defaultName = className.trim() || `Lớp ${gradeLevel}A1`;
+    return generateClassPin(defaultName, gradeLevel, classes.length);
+  }, [className, gradeLevel, classes.length]);
+
   const handleCopyCode = (code: string) => {
     soundManager.playClick();
     navigator.clipboard.writeText(code);
@@ -61,9 +115,8 @@ export const ClassManager: React.FC = () => {
     setIsSubmitting(true);
     soundManager.playCorrect();
 
-    // Tạo mã PIN 6 ký tự ngẫu nhiên (Ví dụ: 6A382, 8B719...)
-    const letter = ['A', 'B', 'C', 'D'][Math.floor(Math.random() * 4)];
-    const generatedPin = `${gradeLevel}${letter}${Math.floor(100 + Math.random() * 900)}`;
+    // Sinh mã PIN chuẩn 6 ký tự: 3 ký tự đầu trùng tên lớp + 3 số thứ tự (001, 002, 003...)
+    const generatedPin = generateClassPin(className, gradeLevel, classes.length);
 
     const newClassObj: ClassRoom = {
       id: 'cls_' + Date.now().toString(36),
@@ -99,7 +152,7 @@ export const ClassManager: React.FC = () => {
 
   return (
     <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl relative">
-      {/* Toast thông báo tạo thành công */}
+      {/* Toast thông báo tạo/xóa thành công */}
       <AnimatePresence>
         {successMessage && (
           <motion.div
@@ -129,7 +182,7 @@ export const ClassManager: React.FC = () => {
               Quản Lý Lớp Học & Phòng Thi Đấu
             </h2>
             <p className="text-xs sm:text-sm text-slate-400">
-              Tạo mã PIN để học sinh tham gia thi đấu theo từng lớp học
+              Tạo mã PIN 6 ký tự chuẩn để học sinh tham gia thi đấu theo từng lớp học
             </p>
           </div>
         </div>
@@ -187,9 +240,9 @@ export const ClassManager: React.FC = () => {
             <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between">
               <div>
                 <span className="text-[10px] text-slate-500 font-semibold uppercase block">
-                  MÃ PIN THAM GIA
+                  MÃ PIN THAM GIA (6 KÝ TỰ)
                 </span>
-                <span className="text-lg font-mono font-black text-amber-400 tracking-wider">
+                <span className="text-xl font-mono font-black text-amber-400 tracking-wider">
                   {c.joinCode || 'CHƯA CÓ'}
                 </span>
               </div>
@@ -239,24 +292,39 @@ export const ClassManager: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="text-lg font-black text-white">Tạo Lớp Học / Phòng Thi Mới</h3>
-                  <p className="text-xs text-slate-400">Cấp mã PIN 6 số tự động cho học sinh</p>
+                  <p className="text-xs text-slate-400">Cấp mã PIN 6 ký tự chuẩn quy tắc lớp</p>
                 </div>
               </div>
 
               <form onSubmit={handleCreateClass} className="space-y-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-300 uppercase mb-1">
-                    Tên Lớp Học *
+                    Tên Lớp Học * (Ví dụ: Lớp 6A1 - Môn Công Nghệ)
                   </label>
                   <input
                     type="text"
                     value={className}
                     onChange={(e) => setClassName(e.target.value)}
-                    placeholder="Ví dụ: Lớp 6A3 - Môn Tin Học"
+                    placeholder="Ví dụ: Lớp 6A1 - Môn Tin Học"
                     className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-cyan-400 outline-none"
                     required
                     autoFocus
                   />
+                </div>
+
+                {/* Khung xem trước Mã PIN 6 ký tự */}
+                <div className="p-3 bg-slate-950/90 border border-cyan-500/40 rounded-xl flex items-center justify-between">
+                  <div className="text-xs">
+                    <span className="text-cyan-400 font-bold flex items-center gap-1">
+                      <KeyRound className="w-3.5 h-3.5" /> Mã PIN tự động (6 ký tự):
+                    </span>
+                    <span className="text-slate-400 text-[11px]">
+                      3 ký tự đầu: <strong className="text-white">{previewPin.slice(0, 3)}</strong> + 3 số thứ tự: <strong className="text-white">{previewPin.slice(3)}</strong>
+                    </span>
+                  </div>
+                  <span className="text-lg font-mono font-black text-amber-400 tracking-wider bg-amber-400/10 px-3 py-1 rounded-lg border border-amber-400/30">
+                    {previewPin}
+                  </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
@@ -320,7 +388,7 @@ export const ClassManager: React.FC = () => {
                     className="flex-1 py-2.5 bg-gradient-to-r from-cyan-500 to-teal-400 hover:from-cyan-400 hover:to-teal-300 text-slate-950 font-black rounded-xl text-xs shadow-md active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-1.5"
                   >
                     <Plus className="w-4 h-4" />
-                    <span>{isSubmitting ? 'Đang tạo...' : 'Tạo Lớp & Cấp PIN'}</span>
+                    <span>{isSubmitting ? 'Đang tạo...' : `Tạo Lớp (${previewPin})`}</span>
                   </button>
                 </div>
               </form>

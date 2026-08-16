@@ -145,7 +145,7 @@ export const QuickPinModal: React.FC<QuickPinModalProps> = ({ isOpen, onClose, o
           <div className="mt-5 pt-4 border-t border-slate-800 text-center">
             <p className="text-xs text-slate-400 mb-2">Mã mẫu thử nghiệm nhanh:</p>
             <div className="flex justify-center gap-2 flex-wrap">
-              {['6A1202', '8B2024', '9C3999'].map((code) => (
+              {['6A1001', '8B2002', '9C3003'].map((code) => (
                 <button
                   key={code}
                   type="button"
