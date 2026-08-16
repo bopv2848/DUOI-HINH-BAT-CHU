@@ -367,16 +367,70 @@ export const recordPlayHistory = async (history: PlayHistory): Promise<{ xpEarne
 
 export const getClasses = async (): Promise<ClassRoom[]> => {
   if (isSupabaseConfigured && supabase) {
-    const { data } = await supabase.from('classes').select('*');
-    if (data && data.length > 0) return data as ClassRoom[];
+    try {
+      const { data, error } = await supabase.from('classes').select('*').order('created_at', { ascending: false });
+      if (!error && data && data.length > 0) {
+        return data.map((d: any) => ({
+          id: d.id,
+          name: d.name,
+          gradeLevel: d.grade_level || 6,
+          schoolLevel: d.school_level || 'secondary',
+          teacherId: d.teacher_id,
+          teacherName: 'Thầy Bộ (Giáo viên Tin & Công nghệ)',
+          joinCode: d.join_code || '',
+          description: d.description || '',
+          studentCount: 0,
+          createdAt: d.created_at,
+        }));
+      }
+    } catch (err) {
+      console.warn('Lỗi đọc lớp từ Supabase:', err);
+    }
   }
   const raw = localStorage.getItem(STORAGE_KEYS.CLASSES);
-  return raw ? JSON.parse(raw) : [];
+  return raw ? JSON.parse(raw) : [
+    {
+      id: 'c1a10000-0001-4000-8000-000000000001',
+      name: 'Lớp 6A1 - THCS Trưng Vương',
+      gradeLevel: 6,
+      schoolLevel: 'secondary',
+      teacherId: 'd9b1c1e0-0001-4000-8000-000000000001',
+      teacherName: 'Thầy Bộ (Giáo viên Tin & Công nghệ)',
+      joinCode: '6A1202',
+      description: 'Lớp chuyên cần sáng tạo môn Tin học & Công nghệ.',
+      studentCount: 28,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'c1a10000-0002-4000-8000-000000000002',
+      name: 'Lớp 8B2 - THCS Chu Văn An',
+      gradeLevel: 8,
+      schoolLevel: 'secondary',
+      teacherId: 'd9b1c1e0-0001-4000-8000-000000000001',
+      teacherName: 'Thầy Bộ (Giáo viên Tin & Công nghệ)',
+      joinCode: '8B2024',
+      description: 'Đội tuyển thi đua Đuổi hình bắt chữ Công nghệ 8.',
+      studentCount: 32,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'c1a10000-0003-4000-8000-000000000003',
+      name: 'Lớp 9C3 - Khóa Hướng Nghiệp',
+      gradeLevel: 9,
+      schoolLevel: 'secondary',
+      teacherId: 'd9b1c1e0-0001-4000-8000-000000000001',
+      teacherName: 'Thầy Bộ (Giáo viên Tin & Công nghệ)',
+      joinCode: '9C3999',
+      description: 'Sinh hoạt HĐTN hướng nghiệp chuẩn bị thi vào lớp 10.',
+      studentCount: 35,
+      createdAt: new Date().toISOString(),
+    }
+  ];
 };
 
 export const joinClassByCode = async (code: string, studentId: string): Promise<{ success: boolean; classRoom?: ClassRoom; message: string }> => {
   const classes = await getClasses();
-  const targetClass = classes.find((c) => c.joinCode.toUpperCase() === code.trim().toUpperCase());
+  const targetClass = classes.find((c) => (c.joinCode || '').toUpperCase() === code.trim().toUpperCase());
   if (!targetClass) {
     return { success: false, message: 'Mã lớp không tồn tại. Vui lòng kiểm tra lại 6 ký tự mã lớp!' };
   }
@@ -403,8 +457,48 @@ export const joinClassByCode = async (code: string, studentId: string): Promise<
 };
 
 export const createNewClass = async (newClass: ClassRoom): Promise<boolean> => {
-  const classes = await getClasses();
-  const updated = [newClass, ...classes];
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const { data, error } = await supabase.from('classes').insert({
+        name: newClass.name,
+        grade_level: newClass.gradeLevel,
+        school_level: newClass.schoolLevel,
+        teacher_id: 'd9b1c1e0-0001-4000-8000-000000000001',
+        join_code: newClass.joinCode,
+        description: newClass.description || null,
+      }).select().single();
+
+      if (!error && data) {
+        newClass.id = data.id;
+      } else {
+        console.warn('Lỗi Supabase khi tạo lớp:', error);
+      }
+    } catch (err) {
+      console.warn('Lỗi kết nối Supabase tạo lớp:', err);
+    }
+  }
+
+  // Cập nhật LocalStorage
+  const raw = localStorage.getItem(STORAGE_KEYS.CLASSES);
+  const currentClasses: ClassRoom[] = raw ? JSON.parse(raw) : [];
+  const updated = [newClass, ...currentClasses.filter((c) => c.joinCode !== newClass.joinCode)];
   localStorage.setItem(STORAGE_KEYS.CLASSES, JSON.stringify(updated));
+  return true;
+};
+
+export const deleteClass = async (classId: string): Promise<boolean> => {
+  if (isSupabaseConfigured && supabase) {
+    try {
+      await supabase.from('classes').delete().eq('id', classId);
+    } catch (err) {
+      console.warn('Lỗi xóa lớp trên Supabase:', err);
+    }
+  }
+  const raw = localStorage.getItem(STORAGE_KEYS.CLASSES);
+  if (raw) {
+    const current: ClassRoom[] = JSON.parse(raw);
+    const filtered = current.filter((c) => c.id !== classId);
+    localStorage.setItem(STORAGE_KEYS.CLASSES, JSON.stringify(filtered));
+  }
   return true;
 };
