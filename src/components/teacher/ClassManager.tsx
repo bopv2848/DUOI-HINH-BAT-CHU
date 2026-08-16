@@ -188,7 +188,7 @@ export const ClassManager: React.FC = () => {
                     className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-cyan-300 font-bold outline-none"
                   >
                     <option value="primary">Tiểu học</option>
-                    <option value="secondary">THCS (GDPT 2018)</option>
+                    <option value="secondary">THCS (Khối 6-9)</option>
                     <option value="high">THPT</option>
                   </select>
                 </div>

@@ -362,7 +362,7 @@ export const CatchWordBoard: React.FC<CatchWordBoardProps> = ({ game, onExit, on
         {/* Tiêu đề câu hỏi & Tiến độ */}
         <div className="text-center">
           <span className="text-[11px] font-mono uppercase tracking-wider text-cyan-400 font-bold block">
-            {game.subjectName || 'CHƯƠNG TRÌNH GDPT 2018'}
+            {game.subjectName || 'BỘ MÔN HỌC TẬP'}
           </span>
           <h2 className="text-sm sm:text-base font-black text-white truncate max-w-[200px] sm:max-w-md">
             Câu {currentQIndex + 1}/{questions.length}: {game.title}
@@ -513,7 +513,7 @@ export const CatchWordBoard: React.FC<CatchWordBoardProps> = ({ game, onExit, on
               {currentQuestion.explanation && (
                 <div className="p-3 bg-slate-950/60 rounded-xl border border-emerald-500/20 text-xs sm:text-sm text-slate-200 leading-relaxed font-medium mb-4">
                   <span className="text-emerald-300 font-bold block mb-1">
-                    📚 Góc Kiến Thức GDPT 2018:
+                    📚 Góc Kiến Thức:
                   </span>
                   {currentQuestion.explanation}
                 </div>

@@ -168,7 +168,7 @@ export const QuestionMaker: React.FC<QuestionMakerProps> = ({ subjects, onGameCr
             Công Cụ Soạn Trò Chơi (Form Maker)
           </h2>
           <p className="text-xs sm:text-sm text-slate-400">
-            Tự tạo bộ câu đố Đuổi hình bắt chữ bám sát kiến thức bài giảng GDPT 2018
+            Tự tạo bộ câu đố Đuổi hình bắt chữ bám sát kiến thức bài giảng
           </p>
         </div>
       </div>
@@ -208,7 +208,7 @@ export const QuestionMaker: React.FC<QuestionMakerProps> = ({ subjects, onGameCr
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-bold text-slate-300 uppercase mb-1">
-                Môn Học (GDPT 2018)
+                Môn Học
               </label>
               <select
                 value={selectedSubjectId}
@@ -348,10 +348,10 @@ export const QuestionMaker: React.FC<QuestionMakerProps> = ({ subjects, onGameCr
                 </div>
               </div>
 
-              {/* Lời giải thích kiến thức GDPT 2018 */}
+              {/* Lời giải thích kiến thức sư phạm */}
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1">
-                  <BookOpen className="w-3.5 h-3.5 text-emerald-400" /> Góc Kiến Thức GDPT 2018 (Hiển thị sau khi giải đúng)
+                  <BookOpen className="w-3.5 h-3.5 text-emerald-400" /> Góc Kiến Thức (Hiển thị sau khi giải đúng)
                 </label>
                 <textarea
                   rows={2}

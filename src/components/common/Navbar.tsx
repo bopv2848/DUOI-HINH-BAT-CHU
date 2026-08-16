@@ -75,7 +75,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
-                  🚀 THCS (Chuẩn GDPT 2018)
+                  🚀 THCS (Khối 6-9)
                 </button>
                 <button
                   onClick={() => handleSelectLevel('high')}
@@ -153,9 +153,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
                 <div className="flex items-center gap-1.5">
                   <span className="text-xl sm:text-2xl font-black tracking-tight text-white group-hover:text-cyan-300 transition-colors">
                     EDUGAME<span className="text-cyan-400">HUB</span>
-                  </span>
-                  <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
-                    GDPT 2018
                   </span>
                 </div>
                 <p className="text-[11px] text-slate-400 hidden sm:block font-medium">

@@ -80,7 +80,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ games })
             {games.length} Bộ ({totalQuestions} câu)
           </span>
           <span className="text-[11px] text-slate-400 font-semibold block mt-1">
-            Chuẩn GDPT 2018
+            Học liệu tương tác
           </span>
         </div>
       </div>

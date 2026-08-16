@@ -11,7 +11,7 @@ export const Footer: React.FC = () => {
           </div>
           <div>
             <p className="font-bold text-white">
-              EduGame Hub - Đuổi Hình Bắt Chữ (GDPT 2018)
+              EduGame Hub - Đuổi Hình Bắt Chữ
             </p>
             <p className="text-[11px] text-slate-500">
               Nền tảng Trò chơi Học tập Trực tuyến Công Nghệ • Tin Học • Hướng Nghiệp

@@ -58,7 +58,7 @@ export const GameHintModal: React.FC<GameHintModalProps> = ({
           {/* Gợi ý kiến thức */}
           <div className="p-4 bg-slate-950/80 border border-slate-800 rounded-2xl mb-4">
             <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 mb-1.5 uppercase">
-              <BookOpen className="w-4 h-4" /> Manh Mối Câu Đố (GDPT 2018):
+              <BookOpen className="w-4 h-4" /> Manh Mối Gợi Ý:
             </div>
             <p className="text-sm text-slate-200 leading-relaxed font-medium">
               "{hintText}"

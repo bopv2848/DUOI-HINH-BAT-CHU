@@ -37,7 +37,7 @@ export interface GameQuestion {
   imageSvg?: string; // Hỗ trợ vẽ vector / hình minh họa trực tiếp chất lượng cao
   answerText: string; // Đáp án (Ví dụ: "TRA CỨU DỮ LIỆU", "BẢN VẼ KỸ THUẬT", "TƯ DUY PHẢN BIỆN")
   hintText: string; // Gợi ý câu đố
-  explanation?: string; // Lời giải thích kiến thức GDPT 2018 sau khi trả lời
+  explanation?: string; // Lời giải thích kiến thức sau khi trả lời đúng
   timeLimitSeconds: number; // Mặc định 45s
   points: number; // Mặc định 100đ
   orderIndex: number;

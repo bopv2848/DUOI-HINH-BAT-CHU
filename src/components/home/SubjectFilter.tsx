@@ -134,7 +134,7 @@ export const SubjectFilter: React.FC<SubjectFilterProps> = ({
                   {group.name}
                 </h4>
                 <p className="text-[10px] text-slate-400 font-medium">
-                  {group.id === 'ALL' ? 'Toàn bộ học liệu' : 'Chuẩn GDPT 2018'}
+                  {group.id === 'ALL' ? 'Toàn bộ học liệu' : 'Học liệu tương tác'}
                 </p>
               </div>
             </button>

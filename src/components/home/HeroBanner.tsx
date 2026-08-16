@@ -16,7 +16,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ onQuickPlay, onOpenPinMo
 
   // Mascot & Content theo cấp học
   let mascotEmoji = '🚀';
-  let badgeText = 'CHƯƠNG TRÌNH GDPT 2018 - THCS';
+  let badgeText = 'GÓC HỌC TẬP - THCS';
   let headline = 'Đuổi Hình Bắt Chữ • Chinh Phục Không Gian Tri Thức';
   let subText = 'Thử thách nhìn hình đoán chữ các môn Công nghệ, Tin học & Hoạt động trải nghiệm khối 6, 7, 8, 9 với bảng xếp hạng Realtime đỉnh cao!';
 
@@ -87,7 +87,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ onQuickPlay, onOpenPinMo
             </div>
             <div className="flex items-center gap-1.5">
               <BookOpen className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="text-slate-200 font-bold">12 Môn Học GDPT 2018</span>
+              <span className="text-slate-200 font-bold">18 Môn Học Đa Dạng</span>
             </div>
             <div className="flex items-center gap-1.5">
               <Trophy className="w-3.5 h-3.5 text-amber-400" />
