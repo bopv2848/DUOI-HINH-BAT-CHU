@@ -28,5 +28,11 @@ dist-ssr
 .env.local
 .env.*.local
 
-# Agent temp
-.agent/scratch
+# Agent directories
+.agent
+.agent/
+.Agent
+.Agent/
+
+# Office temporary files
+~$*
