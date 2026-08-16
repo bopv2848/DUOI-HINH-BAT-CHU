@@ -19,7 +19,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const saved = localStorage.getItem('edugame_current_user');
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (parsed && (parsed.fullName?.includes('Nguyễn Văn Toàn') || parsed.username === 'giaovien.gdpt2018')) {
+          parsed.fullName = 'Thầy Bộ (Giáo viên Tin & Công nghệ)';
+          parsed.username = 'giaovien.tin';
+          parsed.avatarUrl = 'https://api.dicebear.com/7.x/bottts/svg?seed=ThayBo';
+          localStorage.setItem('edugame_current_user', JSON.stringify(parsed));
+        }
+        return parsed;
       } catch {
         return null;
       }
@@ -89,15 +96,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loginAsDemoTeacher = () => {
     const teacherProfile: UserProfile = {
       id: 'teacher_demo_1',
-      username: 'giaovien.gdpt2018',
-      fullName: 'Thầy Nguyễn Văn Toàn (Giáo viên Tin & Công nghệ)',
+      username: 'giaovien.tin',
+      fullName: 'Thầy Bộ (Giáo viên Tin & Công nghệ)',
       role: 'teacher',
       schoolLevel: 'secondary',
       gradeLevel: 6,
       xpPoints: 4200,
       level: 18,
       streakDays: 14,
-      avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=TeacherToan',
+      avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=ThayBo',
     };
     setCurrentUser(teacherProfile);
   };

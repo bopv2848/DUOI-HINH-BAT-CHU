@@ -37,14 +37,14 @@ async function seed() {
     {
       id: 'd9b1c1e0-0001-4000-8000-000000000001',
       username: 'giaovien.tin',
-      full_name: 'Thầy Nguyễn Văn Toàn (Giáo viên Tin & Công nghệ)',
+      full_name: 'Thầy Bộ (Giáo viên Tin & Công nghệ)',
       role: 'teacher',
       school_level: 'secondary',
       grade_level: 6,
       xp_points: 3500,
       level: 15,
       streak_days: 10,
-      avatar_url: 'https://api.dicebear.com/7.x/bottts/svg?seed=TeacherToan',
+      avatar_url: 'https://api.dicebear.com/7.x/bottts/svg?seed=ThayBo',
     },
     {
       id: 'd9b1c1e0-0002-4000-8000-000000000002',

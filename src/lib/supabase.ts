@@ -138,14 +138,14 @@ export const initLocalDatabase = () => {
       {
         id: 'teacher_demo_1',
         username: 'giaovien.tin',
-        fullName: 'Thầy Nguyễn Văn Toàn (Giáo viên)',
+        fullName: 'Thầy Bộ (Giáo viên Tin & Công nghệ)',
         role: 'teacher',
         schoolLevel: 'secondary',
         gradeLevel: 6,
         xpPoints: 3500,
         level: 15,
         streakDays: 10,
-        avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=TeacherToan',
+        avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=ThayBo',
       }
     ];
     localStorage.setItem(STORAGE_KEYS.PROFILES, JSON.stringify(defaultProfiles));
