@@ -44,11 +44,13 @@ export const ClassManager: React.FC = () => {
     setTimeout(() => setCopiedCode(null), 2000);
   };
 
-  const handleDeleteClass = async (classId: string, name: string) => {
+  const handleDeleteClass = async (classId: string, name: string, joinCode?: string) => {
     if (window.confirm(`Thầy có chắc chắn muốn xóa lớp "${name}" không?`)) {
       soundManager.playClick();
-      await deleteClass(classId);
+      await deleteClass(classId, joinCode);
       await loadClasses();
+      setSuccessMessage(`Đã xóa thành công lớp "${name}"`);
+      setTimeout(() => setSuccessMessage(null), 3000);
     }
   };
 
@@ -164,11 +166,11 @@ export const ClassManager: React.FC = () => {
                     <span>{c.studentCount || 0} học sinh</span>
                   </div>
                   <button
-                    onClick={() => handleDeleteClass(c.id, c.name)}
-                    className="opacity-0 group-hover:opacity-100 p-1 text-slate-500 hover:text-rose-400 hover:bg-slate-800 rounded-lg transition-all"
+                    onClick={() => handleDeleteClass(c.id, c.name, c.joinCode)}
+                    className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all cursor-pointer"
                     title="Xóa lớp học này"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>

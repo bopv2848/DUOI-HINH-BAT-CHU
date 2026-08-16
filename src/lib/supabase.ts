@@ -26,6 +26,7 @@ const STORAGE_KEYS = {
   BADGES: 'edugame_badges_db',
   PLAY_HISTORY: 'edugame_play_history_db',
   CLASSES: 'edugame_classes_db',
+  DELETED_CLASSES: 'edugame_deleted_classes',
   PROFILES: 'edugame_profiles_db',
   CURRENT_USER: 'edugame_current_user',
 };
@@ -366,11 +367,16 @@ export const recordPlayHistory = async (history: PlayHistory): Promise<{ xpEarne
 };
 
 export const getClasses = async (): Promise<ClassRoom[]> => {
+  const rawDeleted = localStorage.getItem(STORAGE_KEYS.DELETED_CLASSES);
+  const deletedIds: string[] = rawDeleted ? JSON.parse(rawDeleted) : [];
+
+  let classList: ClassRoom[] = [];
+
   if (isSupabaseConfigured && supabase) {
     try {
       const { data, error } = await supabase.from('classes').select('*').order('created_at', { ascending: false });
       if (!error && data && data.length > 0) {
-        return data.map((d: any) => ({
+        classList = data.map((d: any) => ({
           id: d.id,
           name: d.name,
           gradeLevel: d.grade_level || 6,
@@ -387,45 +393,51 @@ export const getClasses = async (): Promise<ClassRoom[]> => {
       console.warn('Lỗi đọc lớp từ Supabase:', err);
     }
   }
-  const raw = localStorage.getItem(STORAGE_KEYS.CLASSES);
-  return raw ? JSON.parse(raw) : [
-    {
-      id: 'c1a10000-0001-4000-8000-000000000001',
-      name: 'Lớp 6A1 - THCS Trưng Vương',
-      gradeLevel: 6,
-      schoolLevel: 'secondary',
-      teacherId: 'd9b1c1e0-0001-4000-8000-000000000001',
-      teacherName: 'Thầy Bộ (Giáo viên Tin & Công nghệ)',
-      joinCode: '6A1202',
-      description: 'Lớp chuyên cần sáng tạo môn Tin học & Công nghệ.',
-      studentCount: 28,
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'c1a10000-0002-4000-8000-000000000002',
-      name: 'Lớp 8B2 - THCS Chu Văn An',
-      gradeLevel: 8,
-      schoolLevel: 'secondary',
-      teacherId: 'd9b1c1e0-0001-4000-8000-000000000001',
-      teacherName: 'Thầy Bộ (Giáo viên Tin & Công nghệ)',
-      joinCode: '8B2024',
-      description: 'Đội tuyển thi đua Đuổi hình bắt chữ Công nghệ 8.',
-      studentCount: 32,
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'c1a10000-0003-4000-8000-000000000003',
-      name: 'Lớp 9C3 - Khóa Hướng Nghiệp',
-      gradeLevel: 9,
-      schoolLevel: 'secondary',
-      teacherId: 'd9b1c1e0-0001-4000-8000-000000000001',
-      teacherName: 'Thầy Bộ (Giáo viên Tin & Công nghệ)',
-      joinCode: '9C3999',
-      description: 'Sinh hoạt HĐTN hướng nghiệp chuẩn bị thi vào lớp 10.',
-      studentCount: 35,
-      createdAt: new Date().toISOString(),
-    }
-  ];
+
+  if (classList.length === 0) {
+    const raw = localStorage.getItem(STORAGE_KEYS.CLASSES);
+    classList = raw ? JSON.parse(raw) : [
+      {
+        id: 'c1a10000-0001-4000-8000-000000000001',
+        name: 'Lớp 6A1 - THCS Trưng Vương',
+        gradeLevel: 6,
+        schoolLevel: 'secondary',
+        teacherId: 'd9b1c1e0-0001-4000-8000-000000000001',
+        teacherName: 'Thầy Bộ (Giáo viên Tin & Công nghệ)',
+        joinCode: '6A1202',
+        description: 'Lớp chuyên cần sáng tạo môn Tin học & Công nghệ.',
+        studentCount: 28,
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: 'c1a10000-0002-4000-8000-000000000002',
+        name: 'Lớp 8B2 - THCS Chu Văn An',
+        gradeLevel: 8,
+        schoolLevel: 'secondary',
+        teacherId: 'd9b1c1e0-0001-4000-8000-000000000001',
+        teacherName: 'Thầy Bộ (Giáo viên Tin & Công nghệ)',
+        joinCode: '8B2024',
+        description: 'Đội tuyển thi đua Đuổi hình bắt chữ Công nghệ 8.',
+        studentCount: 32,
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: 'c1a10000-0003-4000-8000-000000000003',
+        name: 'Lớp 9C3 - Khóa Hướng Nghiệp',
+        gradeLevel: 9,
+        schoolLevel: 'secondary',
+        teacherId: 'd9b1c1e0-0001-4000-8000-000000000001',
+        teacherName: 'Thầy Bộ (Giáo viên Tin & Công nghệ)',
+        joinCode: '9C3999',
+        description: 'Sinh hoạt HĐTN hướng nghiệp chuẩn bị thi vào lớp 10.',
+        studentCount: 35,
+        createdAt: new Date().toISOString(),
+      }
+    ];
+  }
+
+  // Lọc bỏ triệt để các lớp nằm trong danh sách đã xóa
+  return classList.filter((c) => !deletedIds.includes(c.id) && !deletedIds.includes(c.joinCode));
 };
 
 export const joinClassByCode = async (code: string, studentId: string): Promise<{ success: boolean; classRoom?: ClassRoom; message: string }> => {
@@ -457,6 +469,14 @@ export const joinClassByCode = async (code: string, studentId: string): Promise<
 };
 
 export const createNewClass = async (newClass: ClassRoom): Promise<boolean> => {
+  // Xóa khỏi danh sách đen đã xóa nếu cùng mã PIN
+  const rawDeleted = localStorage.getItem(STORAGE_KEYS.DELETED_CLASSES);
+  if (rawDeleted) {
+    const deletedIds: string[] = JSON.parse(rawDeleted);
+    const filtered = deletedIds.filter((id) => id !== newClass.id && id !== newClass.joinCode);
+    localStorage.setItem(STORAGE_KEYS.DELETED_CLASSES, JSON.stringify(filtered));
+  }
+
   if (isSupabaseConfigured && supabase) {
     try {
       const { data, error } = await supabase.from('classes').insert({
@@ -486,19 +506,29 @@ export const createNewClass = async (newClass: ClassRoom): Promise<boolean> => {
   return true;
 };
 
-export const deleteClass = async (classId: string): Promise<boolean> => {
+export const deleteClass = async (classId: string, joinCode?: string): Promise<boolean> => {
+  // 1. Thêm vào danh sách đã xóa để UI loại bỏ ngay lập tức
+  const rawDeleted = localStorage.getItem(STORAGE_KEYS.DELETED_CLASSES);
+  const deletedIds: string[] = rawDeleted ? JSON.parse(rawDeleted) : [];
+  if (!deletedIds.includes(classId)) deletedIds.push(classId);
+  if (joinCode && !deletedIds.includes(joinCode)) deletedIds.push(joinCode);
+  localStorage.setItem(STORAGE_KEYS.DELETED_CLASSES, JSON.stringify(deletedIds));
+
+  // 2. Xóa khỏi Local Storage
+  const raw = localStorage.getItem(STORAGE_KEYS.CLASSES);
+  if (raw) {
+    const current: ClassRoom[] = JSON.parse(raw);
+    const filtered = current.filter((c) => c.id !== classId && c.joinCode !== joinCode);
+    localStorage.setItem(STORAGE_KEYS.CLASSES, JSON.stringify(filtered));
+  }
+
+  // 3. Xóa trên Supabase
   if (isSupabaseConfigured && supabase) {
     try {
       await supabase.from('classes').delete().eq('id', classId);
     } catch (err) {
       console.warn('Lỗi xóa lớp trên Supabase:', err);
     }
-  }
-  const raw = localStorage.getItem(STORAGE_KEYS.CLASSES);
-  if (raw) {
-    const current: ClassRoom[] = JSON.parse(raw);
-    const filtered = current.filter((c) => c.id !== classId);
-    localStorage.setItem(STORAGE_KEYS.CLASSES, JSON.stringify(filtered));
   }
   return true;
 };
